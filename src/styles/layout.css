@@ -1,0 +1,68 @@
+/* REQUIRED for flex dashboards */
+.min-width-0 {
+  min-width: 0;
+}
+
+/* Prevent page-level horizontal scroll */
+html,
+body {
+  overflow-x: hidden;
+}
+.snap-header {
+  top: 56px; /* height of Topbar */
+  z-index: 100;
+}
+
+/* ===============================
+   Snap Header (Sticky Summary)
+================================ */
+
+.snap-header {
+  top: 0;
+  z-index: 1030; /* above tables, below modal */
+}
+
+.snap-header-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Title area */
+.snap-header-title {
+  border-bottom: 1px solid #f1f3f5;
+}
+
+/* Fields */
+.snap-header-fields {
+  background: #fff;
+}
+
+/* Each field */
+.snap-field {
+  line-height: 1.2;
+}
+
+/* Divider & collapse button */
+.snap-header-divider {
+  background: #fff;
+}
+
+.snap-collapse-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.snap-collapse-btn:hover {
+  background: #e9ecef;
+}

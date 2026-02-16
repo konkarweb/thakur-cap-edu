@@ -1,0 +1,71 @@
+/* =========================
+   VERTICAL SCROLL (ROWS)
+   ========================= */
+.data-table-wrapper {
+  position: relative;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  overflow-x: visible; /* ✅ MUST be visible */
+}
+
+/* =========================
+   HORIZONTAL SCROLL (COLUMNS)
+   ========================= */
+.data-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  border: 1px solid #dee2e6;
+  border-radius: 0 0 6px 6px;
+  position: relative; /* ✅ REQUIRED for sticky */
+}
+
+/* =========================
+   TABLE BASE
+   ========================= */
+.data-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  white-space: nowrap;
+}
+
+/* =========================
+   STICKY HEADER
+   ========================= */
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 4;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* =========================
+   STICKY FIRST COLUMN
+   ========================= */
+.table-sticky-first th:first-child,
+.table-sticky-first td:first-child {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 3;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Header above body */
+.table-sticky-first thead th:first-child {
+  z-index: 6;
+}
+
+/* =========================
+   STICKY TOOLBAR
+   ========================= */
+.table-toolbar-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
