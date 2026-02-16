@@ -2,15 +2,15 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import YouTube from 'react-youtube'
 import Breadcrumbs from '../../components/Breadcrumbs'
-import { getEbookPlayerData, updateEbookProgress } from '../../api/courseware.api'
+import { getRecLecturePlayerData, updateRecLectureProgress } from '../../api/courseware.api'
 
-const EbookPlayer = () => {
+const LectureRecording = () => {
 
-  const { ProgressId } = useParams()
+  const { AttendanceId } = useParams()
   const auth = JSON.parse(localStorage.getItem('auth'))
   const studentId = auth?.user_id
 
-  const [ebook, setEbook] = useState(null)
+  const [RecLecture, setRecLecture] = useState(null)
   const [player, setPlayer] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -20,17 +20,17 @@ const EbookPlayer = () => {
      Fetch Player Data
   =============================== */
   useEffect(() => {
-    if (!ProgressId|| !studentId) return
+    if (!AttendanceId|| !studentId) return
 
-    getEbookPlayerData(ProgressId, studentId)
+    getRecLecturePlayerData(AttendanceId, studentId)
       .then(res => {
-        setEbook(res.data)
+        setRecLecture(res.data)
       })
       .catch(err => {
-        console.error('Error loading ebook player', err)
+        console.error('Error loading rec lecture player', err)
       })
 
-  }, [ProgressId, studentId])
+  }, [AttendanceId, studentId])
 
   /* ===============================
      Start Tracking When Playing
@@ -48,11 +48,11 @@ const EbookPlayer = () => {
 
       const percent = ((current / duration) * 100).toFixed(2)
 
-      updateEbookProgress({
-        progress_id: ProgressId,
-        last_watched_second: Math.floor(current),
-        watched_percent: percent >= 95 ? 100 :percent,
-        is_completed: percent >= 95 ? 1 : 0
+      updateRecLectureProgress({
+        attendance_id: AttendanceId,
+        rec_last_watched_second: Math.floor(current),
+        rec_watched_percent: percent >= 95 ? 100 :percent,
+        rec_is_completed: percent >= 95 ? 1 : 0
       })
 
     }, 5000) // every 5 sec
@@ -71,8 +71,8 @@ const EbookPlayer = () => {
     setPlayer(event.target)
 
     // Resume from last position
-    if (ebook?.data.last_watched_second > 0) {
-      event.target.seekTo(ebook.data.last_watched_second, true)
+    if (RecLecture?.data.rec_last_watched_second > 0) {
+      event.target.seekTo(RecLecture.data.rec_last_watched_second, true)
     }
   }
 
@@ -89,10 +89,10 @@ const EbookPlayer = () => {
     }
   }
 
-  if (!ebook) return <div className="text-center p-5">Loading...</div>
+  if (!RecLecture) return <div className="text-center p-5">Loading...</div>
 
 
-  console.log('Ebook Player Data →', ebook) 
+  console.log('Rec Lecture Player Data →', RecLecture) 
   
   return (
      <div className="container-fluid p-4">
@@ -100,19 +100,18 @@ const EbookPlayer = () => {
         items={[
           { label: 'Home', to: '/dashboard' },
           { label: 'Courseware', to: '/dashboard/courseswares'},
-          { label: ebook.data.book_name, active: true }
+          { label: RecLecture?.data?.lecture_title, active: true }
         ]}
       />
 
-      <h4 className="fw-bold mb-3">{ebook.data.book_name}</h4>
-
+      <h4 className="fw-bold mb-3">{RecLecture?.data?.lecture_title} ( {RecLecture?.data?.lecture_date})</h4>
       <div className="card shadow border-0">
         <div className="card-body">
 
           <div className="ratio ratio-16x9">
 
             <YouTube
-              videoId={ebook.data.video_id}
+              videoId={RecLecture?.data?.video_id}
               onReady={onReady}
               onStateChange={onStateChange}
               opts={{
@@ -136,4 +135,4 @@ const EbookPlayer = () => {
   )
 }
 
-export default EbookPlayer
+export default LectureRecording

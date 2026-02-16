@@ -18,6 +18,8 @@ import AssgnSubmsnDetailsPage from './pages/assignmentSubmissions/AssgnSubmsnDet
 import AttendanceDetailsPage from './pages/attendance/AttendanceDetailsPage'
 import CoursewarePage from './pages/courseware/CoursewarePage'
 import EbookPlayer from './pages/ebookplayer/EbookPlayer'
+import LectureRecording from './pages/LectureRecording/LectureRecording'
+
 function App() {
   return (
   
@@ -47,6 +49,7 @@ function App() {
     <Route path="profile/edit" element={<ProfileEdit />} />
     <Route path="profile/change-password" element={<ChangePassword />} />
     <Route path="ebook-player/:ProgressId" element={<RoleRoute roles={["STUDENT"]}><EbookPlayer /></RoleRoute>}  /> 
+    <Route path="lecture-recording/:AttendanceId" element={<RoleRoute roles={["STUDENT"]}><LectureRecording /></RoleRoute>}  />
   </Route>
 </Routes>
       </BrowserRouter>

@@ -47,3 +47,13 @@ export const updateEbookProgress = (payload) =>
 export const getLecturesWithAttendance = (enrollmentId) => api.get('/data/get_lec_attends_by_student_by_course', {
     params: { enrollment_id: enrollmentId }
   })
+
+
+  export const updateRecLectureProgress = (payload) =>
+  api.post('/admin/update_rec_lecture_prgrs', payload)
+
+
+export const getRecLecturePlayerData = (attendance_id, student_id) =>
+  api.get('/data/get_lec_attends_by_id', {
+    params: { attendance_id, student_id }
+  })

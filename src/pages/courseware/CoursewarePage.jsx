@@ -121,7 +121,8 @@ useEffect(() => {
         chapterId: assign.chapter_id,
         title: assign.assignment_title,
         dueDate: assign.due_date,
-        status: assign.submission_status
+        status: assign.submission_status,
+        submission_id: assign.submission_id
       }))
 
       setAllAssignments(formattedAssignments)
@@ -215,13 +216,14 @@ useEffect(() => {
       const rawData = res.data?.data || []
 
       const formatted = rawData.map(lec => ({
+        attendance_id: lec.attendance_id,
         id: lec.lecture_id,
         title: lec.lecture_title,
         date: lec.lecture_date,
         time: lec.lecture_time,
         attendanceStatus: lec.attendance_status,
         videoId: lec.video_id, // Add in backend later
-        progress: parseFloat(lec.watched_percent || 0),
+        progress: parseFloat(lec.rec_watched_percent || 0),
         completed: lec.is_completed === 1
       }))
 

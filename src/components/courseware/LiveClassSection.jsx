@@ -1,7 +1,9 @@
 import React from "react"
 import { ProgressBar } from "react-bootstrap"
+import { useNavigate } from "react-router-dom";
 
 const LiveClassSection = ({ lectures, loading }) => {
+const navigate = useNavigate();
 
   if (loading) return <p>Loading live lectures...</p>
 
@@ -38,6 +40,7 @@ const LiveClassSection = ({ lectures, loading }) => {
               </span>
 
               {/* Watch Button */}
+              {console.log('Lecture Data →', lec)}
               {lec.videoId && (
                 <>
                   <div className="mt-3">
@@ -49,9 +52,11 @@ const LiveClassSection = ({ lectures, loading }) => {
 
                   <button
                     className="btn btn-primary btn-sm mt-3"
-                    onClick={() => {
-                      window.open(`/live-player/${lec.id}`, "_blank")
-                    }}
+                    onClick={() => 
+                         navigate(`/dashboard/lecture-recording/${lec.attendance_id}`, {
+                      state: { lecture: lec }
+                    })
+                    }
                   >
                     ▶ Watch Recording
                   </button>
