@@ -19,6 +19,7 @@ import AttendanceDetailsPage from './pages/attendance/AttendanceDetailsPage'
 import CoursewarePage from './pages/courseware/CoursewarePage'
 import EbookPlayer from './pages/ebookplayer/EbookPlayer'
 import LectureRecording from './pages/LectureRecording/LectureRecording'
+import CoursesPage from './pages/courses/CoursesPage'
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
     <Route path="assignment-submissions/:id/" element={<RoleRoute roles={["ADMIN", "MONITOR","STUDENT"]}><AssgnSubmsnDetailsPage /></RoleRoute>} />
     <Route path="attendance/:id" element={<RoleRoute roles={["ADMIN", "MONITOR"]}><AttendanceDetailsPage /></RoleRoute>} />
     <Route path="courseswares" element={<RoleRoute roles={["STUDENT"]}><CoursewarePage /></RoleRoute>} />
+    <Route path="courses" element={<RoleRoute roles={["ADMIN"]}><CoursesPage /></RoleRoute>} />
     <Route path="profile" element={<ProfileView />} />
     <Route path="profile/edit" element={<ProfileEdit />} />
     <Route path="profile/change-password" element={<ChangePassword />} />

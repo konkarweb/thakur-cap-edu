@@ -6,6 +6,12 @@ export const getStudents = (filters = {}) => {
   })
 }
 
+export const getCoursesWithNoOfRegistration = (filters = {}) => {
+  return api.get('/data/get_courses_with_no_reg', {
+    params: filters, // future ready
+  })
+}
+
 // DETAILS (BY ID)
 export const getStudentById = (userId) => {
 return api.get('/data/get_student', {
