@@ -5,8 +5,10 @@ const EntityDetailsForm = ({
   data = {},
   onSave,
   loading = false,
+  mode: initialMode = "view"
 }) => {
-  const [mode, setMode] = useState('view') // view | edit
+
+  const [mode, setMode] = useState(initialMode)
   const [form, setForm] = useState(data)
   const [original, setOriginal] = useState(data)
 
@@ -15,19 +17,26 @@ const EntityDetailsForm = ({
     setOriginal(data)
   }, [data])
 
+  useEffect(() => {
+    setMode(initialMode)
+  }, [initialMode])
+
   const handleChange = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
   const handleSave = async () => {
-    await onSave(form)
-    setOriginal(form)
-    setMode('view')
+    const res = await onSave(form)
+
+    if (res !== false) {
+      setOriginal(form)
+      setMode("view")
+    }
   }
 
   const handleCancel = () => {
     setForm(original)
-    setMode('view')
+    setMode("view")
   }
 
   const isDirty = JSON.stringify(form) !== JSON.stringify(original)
@@ -36,6 +45,7 @@ const EntityDetailsForm = ({
     <>
       {/* Action buttons */}
       <div className="d-flex justify-content-end gap-2 mb-3">
+
         {mode === 'view' && (
           <button
             className="btn btn-sm btn-outline-primary"
@@ -64,45 +74,69 @@ const EntityDetailsForm = ({
             </button>
           </>
         )}
+
       </div>
 
       {/* Fields */}
       <div className="row g-3">
+
         {fields.map(f => (
-          <div className="col-md-4" key={f.key}>
+          <div className={f.col || "col-md-4"} key={f.key}>
+
             <label className="form-label">{f.label}</label>
 
             {mode === 'edit' ? (
+
               f.render ? (
                 f.render(form[f.key], val => handleChange(f.key, val))
-              ) : f.type === 'select' ? (
-  <select
-    className="form-select"
-    value={form[f.key] ?? ''}
-    onChange={e => handleChange(f.key, e.target.value)}
-  >
-    <option value="">-- Select --</option>
-    {f.options?.map(opt => (
-      <option key={opt.value} value={opt.value}>
-        {opt.label}
-      </option>
-    ))}
-  </select>
-) : (
-  <input
-    type={f.type || 'text'}
-    className="form-control"
-    value={form[f.key] ?? ''}
-    onChange={e => handleChange(f.key, e.target.value)}
-  />
-)
+              )
+
+              : f.type === 'select' ? (
+                <select
+                  className="form-select"
+                  value={form[f.key] ?? ''}
+                  onChange={e => handleChange(f.key, e.target.value)}
+                >
+                  <option value="">-- Select --</option>
+
+                  {f.options?.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+
+                </select>
+              )
+
+              : f.type === 'textarea' ? (
+                <textarea
+                  className="form-control"
+                  rows={f.rows || 3}
+                  value={form[f.key] ?? ''}
+                  onChange={e => handleChange(f.key, e.target.value)}
+                />
+              )
+
+              : (
+                <input
+                  type={f.type || 'text'}
+                  className="form-control"
+                  value={form[f.key] ?? ''}
+                  onChange={e => handleChange(f.key, e.target.value)}
+                />
+              )
+
             ) : (
+
               <div className="form-control-plaintext">
                 {form[f.key] ?? '-'}
               </div>
+
             )}
+
           </div>
         ))}
+
       </div>
     </>
   )

@@ -12,6 +12,29 @@ export const getCoursesWithNoOfRegistration = (filters = {}) => {
   })
 }
 
+export const getCourseById = (CourseID) => {
+return api.get('/data/get_course', {
+params: { CourseID: CourseID },
+})
+}
+
+
+export const updateCourse = (CourseID, payload) => {
+  console.log('UPDATE COURSE', CourseID, payload)
+
+  return api.post('/admin/update_course', {
+    CourseID,
+    ...payload
+  })
+}
+
+export const createCourse = (payload) => {
+  console.log('CREATE COURSE', payload)
+
+  return api.post('/admin/create_course', payload)
+}
+
+
 // DETAILS (BY ID)
 export const getStudentById = (userId) => {
 return api.get('/data/get_student', {
