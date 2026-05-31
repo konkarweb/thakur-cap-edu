@@ -101,3 +101,18 @@ body,
     background-color: #f9f9f9;
   }
 }
+
+.topic-content {
+  line-height: 1.6;
+}
+
+.topic-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.topic-content p {
+  margin-bottom: 10px;
+}

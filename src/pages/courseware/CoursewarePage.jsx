@@ -222,6 +222,7 @@ useEffect(() => {
         date: lec.lecture_date,
         time: lec.lecture_time,
         attendanceStatus: lec.attendance_status,
+        tag: lec.tag, // live, upcoming, past
         videoId: lec.video_id, // Add in backend later
         progress: parseFloat(lec.rec_watched_percent || 0),
         completed: lec.is_completed === 1

@@ -66,3 +66,18 @@ body {
 .snap-collapse-btn:hover {
   background: #e9ecef;
 }
+
+.topic-content {
+  line-height: 1.6;
+}
+
+.topic-content img {
+  max-width: 80%;
+  height: auto;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.topic-content p {
+  margin-bottom: 10px;
+}

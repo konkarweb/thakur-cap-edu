@@ -1,11 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
-
 import SnapHeader from '../../components/SnapHeader'
 import EntityTabs from '../../components/EntityTabs'
 import EntityDetailsForm from '../../components/EntityDetailsForm'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import SnapHeaderCollapse from '../../components/SnapHeaderCollapse'
+import CourseRegistrationsTab from './tabs/CourseRegistrationsTab'
+import CourseChaptersTab from './tabs/CourseChaptersTab'
+import CourseEbooksTab from './tabs/CourseEbooksTab'
+import CourseLecturesTab from './tabs/CourseLecturesTab'
 
 import { getCourseById, updateCourse, createCourse} from '../../api/students.api'
 import { getCourseTypes } from '../../api/dropdown.api'
@@ -15,7 +18,9 @@ const CourseDetailsPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const isNew = id === "new"
+ const isNew = id === 'new' || id === 'newtemplate'
+
+const isTemplate = id === 'newtemplate'
 
   const [course, setCourse] = useState(null)
   const [courseTypes, setCourseTypes] = useState([])
@@ -65,14 +70,33 @@ const CourseDetailsPage = () => {
 
   if (!course) return null
 
+
+const isCourseTemplate =
+  isTemplate || course?.CourseTemplate === 'X'
+
   return (
+    
     <>
+    
       <Breadcrumbs
         items={[
           { label: 'Home', to: '/dashboard' },
-          { label: 'Courses', to: '/dashboard/courses' },
-          { label: isNew ? "New Course" : course.CourseTitle, active: true },
-        ]}
+          {
+      label: isCourseTemplate ? 'Course Templates' : 'Courses',
+      to: isCourseTemplate
+        ? '/dashboard/course-templates'
+        : '/dashboard/courses',
+    },
+          {
+      label: isNew
+        ? (isCourseTemplate
+            ? 'New Course Template'
+            : 'New Course')
+        : course.CourseTitle,
+      active: true,
+    },
+
+]}
       />
 
       {!isNew && (
@@ -129,7 +153,7 @@ const CourseDetailsPage = () => {
                   { key: 'Fees', label: 'Fees', type: 'number', col: 'col-md-6' },
 
                   { key: 'Time', label: 'Time', col: 'col-md-6' },
-
+                 
                   {
                     key: 'Completed',
                     label: 'Stop Registrations',
@@ -140,6 +164,9 @@ const CourseDetailsPage = () => {
                       { label: 'No', value: '' }
                     ]
                   },
+                   { key: 'CourseTemplate', label: 'Course Template', col: 'col-md-6', 
+                    defaultValue: isTemplate ? 'X' : null},
+                   
 
                   { key: 'ZoomLink', label: 'Zoom Link', col: 'col-md-12' },
 
@@ -157,6 +184,29 @@ const CourseDetailsPage = () => {
                 ]}
               />
             ),
+          },
+           // Only show Registrations for actual courses
+        ...(!isCourseTemplate
+          ? [{
+              key: 'registrations',
+              label: 'Registrations',
+              render: () => <CourseRegistrationsTab CourseID={id} />,
+            }]
+          : []),
+          {
+            key: 'chapters',
+            label: 'Chapters',
+            render: () => <CourseChaptersTab CourseID={id} />,
+          },
+          {
+            key: 'ebooks',
+            label: 'Ebooks',
+            render: () => <CourseEbooksTab CourseID={id} />,
+          },
+          {
+            key: 'lectures',
+            label: 'Lectures',
+            render: () => <CourseLecturesTab CourseID={id} />,
           }
         ]}
       />

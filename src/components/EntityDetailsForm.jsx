@@ -9,14 +9,33 @@ const EntityDetailsForm = ({
 }) => {
 
   const [mode, setMode] = useState(initialMode)
-  const [form, setForm] = useState(data)
-  const [original, setOriginal] = useState(data)
+  const [form, setForm] = useState({})
+  const [original, setOriginal] = useState({})
 
+  // Sync data → form
   useEffect(() => {
-    setForm(data)
-    setOriginal(data)
-  }, [data])
 
+  const formData = { ...(data || {}) }
+
+  fields.forEach(field => {
+
+    if (
+      (formData[field.key] === undefined ||
+       formData[field.key] === null ||
+       formData[field.key] === '') &&
+      field.defaultValue !== undefined
+    ) {
+      formData[field.key] = field.defaultValue
+    }
+
+  })
+
+  setForm(formData)
+  setOriginal(formData)
+
+}, [data, fields])
+
+  // Sync mode
   useEffect(() => {
     setMode(initialMode)
   }, [initialMode])
@@ -26,11 +45,25 @@ const EntityDetailsForm = ({
   }
 
   const handleSave = async () => {
-    const res = await onSave(form)
+    try {
+      // 🔥 Build FormData
+      const formData = new FormData()
 
-    if (res !== false) {
-      setOriginal(form)
-      setMode("view")
+      Object.keys(form).forEach(key => {
+        console.log(`Processing field ${key}:`, form[key])
+        formData.append(key, form[key] ?? '')
+      })
+
+      console.log('Saving form data:', formData)
+      const res = await onSave(form)
+
+      if (res !== false) {
+        setOriginal(form)
+        setMode("view")
+      }
+
+    } catch (err) {
+      console.error("Save failed", err)
     }
   }
 
@@ -39,7 +72,10 @@ const EntityDetailsForm = ({
     setMode("view")
   }
 
-  const isDirty = JSON.stringify(form) !== JSON.stringify(original)
+  // 🔥 FIXED dirty check
+  const isDirty = Object.keys(form).some(
+    key => String(form[key] ?? '') !== String(original[key] ?? '')
+  )
 
   return (
     <>
@@ -87,15 +123,24 @@ const EntityDetailsForm = ({
 
             {mode === 'edit' ? (
 
+              // 🔥 Custom render (like ReactQuill etc.)
               f.render ? (
                 f.render(form[f.key], val => handleChange(f.key, val))
               )
 
+              // 🔥 SELECT FIX (convert to number if needed)
               : f.type === 'select' ? (
                 <select
                   className="form-select"
                   value={form[f.key] ?? ''}
-                  onChange={e => handleChange(f.key, e.target.value)}
+                  onChange={e =>
+                    handleChange(
+                      f.key,
+                      isNaN(e.target.value)
+                        ? e.target.value
+                        : Number(e.target.value)
+                    )
+                  }
                 >
                   <option value="">-- Select --</option>
 
@@ -104,10 +149,10 @@ const EntityDetailsForm = ({
                       {opt.label}
                     </option>
                   ))}
-
                 </select>
               )
 
+              // TEXTAREA
               : f.type === 'textarea' ? (
                 <textarea
                   className="form-control"
@@ -117,6 +162,7 @@ const EntityDetailsForm = ({
                 />
               )
 
+              // INPUT
               : (
                 <input
                   type={f.type || 'text'}
@@ -128,8 +174,11 @@ const EntityDetailsForm = ({
 
             ) : (
 
+              // VIEW MODE
               <div className="form-control-plaintext">
-                {form[f.key] ?? '-'}
+                {f.render
+                  ? f.render(form[f.key], () => {})
+                  : form[f.key] ?? '-'}
               </div>
 
             )}

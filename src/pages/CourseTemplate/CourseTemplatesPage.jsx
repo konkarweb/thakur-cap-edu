@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { getCoursesWithNoOfRegistration, syncCourse } from '../../api/students.api'
+import React, { useState, useEffect } from 'react'
+import { getCoursesWithNoOfRegistration } from '../../api/students.api'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import DynamicFilter from '../../components/filters/DynamicFilter'
 import DataTable from '../../components/DataTable'
@@ -11,10 +11,21 @@ import { getCourseTypes } from '../../api/dropdown.api'
 // 👉 CREATE PROPER ACTION API (IMPORTANT)
 
 
-const CoursesPage = () => {
+
+const CourseTemplatesPage = () => {
   const navigate = useNavigate()
 
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState({
+    CourseTemplate: 'X',
+  })
+
+useEffect(() => {
+  fetchCourses({
+    CourseTemplate: 'X',
+  })
+}, [])
+
+  
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -42,18 +53,6 @@ const CoursesPage = () => {
 
   // ✅ ROW LEVEL ACTIONS (GRID)
   const actions = [
-    {
-      label: 'Generate / Sync LMS Course',
-      icon: '🎓',
-      className: 'btn btn-success btn-sm',
-      type: 'row',
-      api: syncCourse, // ⚠️ FIXED (not GET API)
-      confirm: true,
-      getParams: (row) => ({
-        courseId: row.CourseID,
-      }),
-      onSuccess: () => fetchCourses(filters),
-    },
   ]
 
   const columns = [
@@ -64,17 +63,19 @@ const CoursesPage = () => {
     },
     { key: 'CourseTitle', label: 'Course Title' },
     { key: 'CourseSubTitle', label: 'Subtitle' },
-    { key: 'CourseType', label: 'Course Type' },
-    { key: 'CourseDate', label: 'Course Date' },
-    { key: 'CourseLocation', label: 'Course Location' },
-    { key: 'Fees', label: 'Fees' },
-    { key: 'NoOfRegistrations', label: 'No. of Students Enrolled' },
+    { key: 'CourseType', label: 'Course Type' }
   ]
 
   const fetchCourses = async (appliedFilters = {}) => {
+
+    const finalFilters = {
+    CourseTemplate: 'X',
+    ...appliedFilters,
+  }
     setLoading(true)
     try {
-      setFilters(appliedFilters)
+      setFilters(finalFilters)
+
       const res = await getCoursesWithNoOfRegistration(appliedFilters)
       setCourses(res.data.data || [])
       setSelectedRows([]) // reset selection
@@ -90,29 +91,24 @@ const CoursesPage = () => {
       <Breadcrumbs
         items={[
           { label: 'Home', to: '/dashboard' },
-          { label: 'Courses', active: true },
+          { label: 'Course Templates', active: true },
         ]}
       />
 
-      <FilterCollapse>
-        <DynamicFilter
-          config={courseFilters}
-          onSearch={fetchCourses}
-        />
-      </FilterCollapse>
+    
 
       {/* ✅ TOOLBAR WITH BULK ACTION */}
       <TableToolbar
-        title="Courses"
+        title="Course Templates"
         count={courses.length}
         selectedCount={selectedRows.length} // 🔥 NEW
         actions={[
           {
-            label: 'Add Course',
+            label: 'Create Course Template',
             icon: '➕',
             className: 'btn btn-primary btn-sm',
-            onClick: () => navigate('/dashboard/courses/new'),
-          },
+            onClick: () => navigate('/dashboard/courses/newtemplate'),
+        },
           // 🔥 BULK ACTION
           {
             label: 'Export',
@@ -154,4 +150,4 @@ const CoursesPage = () => {
   )
 }
 
-export default CoursesPage
+export default CourseTemplatesPage
