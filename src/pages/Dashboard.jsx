@@ -1,46 +1,88 @@
 import React, { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { getStudentDashboard } from "../api/students.api";
-import { useParams } from "react-router-dom";
 
 export default function CourseDashboard() {
-  const { courseId } = 51;
+  const navigate = useNavigate();
 
-  const [dashboard, setDashboard] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadDashboard();
-  }, [courseId]);
+  }, []);
 
   const loadDashboard = async () => {
     try {
       setLoading(true);
 
-      const response = await getStudentDashboard(courseId);
+      const response = await getStudentDashboard();
 
-      console.log("Dashboard Response", response);
+      console.log("Dashboard Response", response.data);
 
-      setDashboard(response.data || response);
+      setCourses(response?.data?.courses || []);
     } catch (error) {
-      console.error(error);
+      console.error("Dashboard Error", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const totalCourses = courses.length;
+
+  const totalLectures = courses.reduce(
+    (sum, c) => sum + (c.total_lectures || 0),
+    0
+  );
+
+  const completedLectures = courses.reduce(
+    (sum, c) => sum + (c.completed_lectures || 0),
+    0
+  );
+
+  const totalEbooks = courses.reduce(
+    (sum, c) => sum + (c.total_ebooks || 0),
+    0
+  );
+
+  const completedEbooks = courses.reduce(
+    (sum, c) => sum + (c.completed_ebooks || 0),
+    0
+  );
+
+  const totalAssignments = courses.reduce(
+  (sum, c) => sum + (c.total_assignments || 0),
+  0
+);
+
+const submittedAssignments = courses.reduce(
+  (sum, c) => sum + (c.submitted_assignments || 0),
+  0
+);
+
+  const avgProgress =
+    totalCourses > 0
+      ? Math.round(
+          courses.reduce(
+            (sum, c) => sum + (c.overall_progress || 0),
+            0
+          ) / totalCourses
+        )
+      : 0;
+
   if (loading) {
     return (
       <div className="text-center p-5">
-        Loading Dashboard...
+        <h5>Loading Dashboard...</h5>
       </div>
     );
   }
 
-  if (!dashboard) {
+  if (!courses.length) {
     return (
-      <div className="alert alert-warning">
-        Dashboard data not found.
+      <div className="alert alert-info">
+        No Enrolled Courses Found
       </div>
     );
   }
@@ -48,99 +90,374 @@ export default function CourseDashboard() {
   return (
     <div className="container-fluid">
 
+      {/* Dashboard Summary */}
+
+      <div className="row mb-4">
+
+        <div className="col-md-3 mb-3">
+          <div className="card shadow-sm border-0">
+            <div className="card-body text-center">
+              <h6 className="text-muted">
+                Total Courses
+              </h6>
+              <h2>{totalCourses}</h2>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-3 mb-3">
+          <div className="card shadow-sm border-0">
+            <div className="card-body text-center">
+              <h6 className="text-muted">
+                Overall Progress
+              </h6>
+              <h2>{avgProgress}%</h2>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-2 mb-2">
+          <div className="card shadow-sm border-0">
+            <div className="card-body text-center">
+              <h6 className="text-muted">
+                Recordedings
+              </h6>
+              <h2>
+                {completedLectures}/{totalLectures}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-2 mb-2">
+          <div className="card shadow-sm border-0">
+            <div className="card-body text-center">
+              <h6 className="text-muted">
+                Ebooks
+              </h6>
+              <h2>
+                {completedEbooks}/{totalEbooks}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-2 mb-2">
+          <div className="card shadow-sm border-0">
+            <div className="card-body text-center">
+              <h6 className="text-muted">
+                Assignments
+              </h6>
+
+              <h2>
+                {submittedAssignments}
+                /
+                {totalAssignments}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Course Cards */}
+
       <div className="row">
 
-        <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
-            <div className="card-body text-center">
-              <h6>Course Progress</h6>
-              <h2>
-                {dashboard?.progress?.overall_percent || 0}%
-              </h2>
-            </div>
-          </div>
-        </div>
+        {courses.map((course) => (
 
-        <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
-            <div className="card-body text-center">
-              <h6>Attendance</h6>
-              <h2>
-                {dashboard?.attendance?.attendance_percent || 0}%
-              </h2>
-            </div>
-          </div>
-        </div>
+          <div
+            key={course.course_id}
+            className="col-lg-12 mb-12"
+          >
 
-        <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
-            <div className="card-body text-center">
-              <h6>Lectures Completed</h6>
-              <h2>
-                {dashboard?.progress?.lectures_completed || 0}
-                /
-                {dashboard?.progress?.lectures_total || 0}
-              </h2>
-            </div>
-          </div>
-        </div>
+            <div className="card shadow-sm border-0 h-100">
 
-        <div className="col-md-3 mb-3">
-          <div className="card shadow-sm">
-            <div className="card-body text-center">
-              <h6>Ebooks Completed</h6>
-              <h2>
-                {dashboard?.progress?.ebooks_completed || 0}
-                /
-                {dashboard?.progress?.ebooks_total || 0}
-              </h2>
-            </div>
-          </div>
-        </div>
+              <div className="card-body">
 
+                {/* Course Header */}
+
+                <div className="d-flex justify-content-between">
+
+                  <div>
+
+                    <h5 className="fw-bold">
+                      {course.course_title}
+                    </h5>
+
+                    <div className="text-muted">
+                      {course.course_subtitle}
+                    </div>
+
+                    <div className="mt-2">
+
+                      <span className="badge bg-primary me-2">
+                        {course.course_type}
+                      </span>
+
+                    </div>
+
+                    <div className="mt-2 text-muted">
+                      📅 {course.course_date}
+                    </div>
+
+                    <div className="text-muted">
+                      🌐 {course.language}
+                    </div>
+
+                  </div>
+
+                  <div className="text-end">
+
+                    <div className="text-muted small">
+                      Progress
+                    </div>
+
+                    <h3>
+                      {course.overall_progress}%
+                    </h3>
+
+                  </div>
+
+                </div>
+
+                {/* Progress Bar */}
+
+                <div className="mt-3">
+
+                  <ProgressBar
+                    now={course.overall_progress}
+                    label={`${course.overall_progress}%`}
+                  />
+
+                </div>
+
+                {/* Stats */}
+
+                <div className="row mt-4">
+
+  <div className="col-6 mb-3">
+    <div className="border rounded p-2 text-center">
+      <small className="text-muted">
+        Chapters
+      </small>
+      <h5>
+        {course.total_chapters}
+      </h5>
+    </div>
+  </div>
+
+  <div className="col-6 mb-3">
+    <div className="border rounded p-2 text-center">
+      <small className="text-muted">
+        Topics
+      </small>
+      <h5>
+        {course.total_topics}
+      </h5>
+    </div>
+  </div>
+
+  <div className="col-6 mb-3">
+    <div className="border rounded p-2 text-center">
+      <small className="text-muted">
+        Recordings
+      </small>
+
+      <h5>
+        {course.completed_lectures}
+        /
+        {course.total_lectures}
+      </h5>
+    </div>
+  </div>
+
+  <div className="col-6 mb-3">
+    <div className="border rounded p-2 text-center">
+      <small className="text-muted">
+        Ebooks
+      </small>
+
+      <h5>
+        {course.completed_ebooks}
+        /
+        {course.total_ebooks}
+      </h5>
+    </div>
+  </div>
+
+  <div className="col-12 mb-3">
+    <div className="border rounded p-2 text-center">
+
+      <small className="text-muted">
+        Assignments
+      </small>
+
+      <h5>
+        {course.submitted_assignments}
+        /
+        {course.total_assignments}
+      </h5>
+
+    </div>
+  </div>
+
+</div>
+
+                {/* Attendance */}
+
+                <div className="mb-4">
+
+                  <h6>
+                    Attendance
+                  </h6>
+
+                  <ProgressBar
+                    now={course.attendance_percent}
+                    label={`${course.attendance_percent}%`}
+                  />
+
+                </div>
+
+                {/* Continue Learning */}
+
+                <div className="mb-4">
+
+                  <h6>
+                    Continue Learning
+                  </h6>
+
+                  {course.continue_learning ? (
+                    <>
+                      <div>
+                        {
+                          course.continue_learning
+                            .lecture_title
+                        }
+                      </div>
+
+                      <ProgressBar
+                        className="mt-2"
+                        now={
+                          course.continue_learning
+                            .rec_watched_percent || 0
+                        }
+                        label={`${
+                          course.continue_learning
+                            .rec_watched_percent || 0
+                        }%`}
+                      />
+                    </>
+                  ) : (
+                    <div className="text-muted">
+                      No Lecture Started Yet
+                    </div>
+                  )}
+
+                </div>
+
+                <div className="mb-4">
+
+  <h6>
+    Assignments
+  </h6>
+
+  <div className="mb-2">
+
+    <span className="badge bg-success me-2">
+      Submitted:
+      {" "}
+      {course.submitted_assignments}
+    </span>
+
+    <span className="badge bg-warning text-dark">
+      Pending:
+      {" "}
+      {course.pending_assignments}
+    </span>
+
+  </div>
+
+  {course.next_assignment ? (
+    <div>
+
+      <div className="fw-semibold">
+        {course.next_assignment.title}
       </div>
 
-      <div className="card shadow-sm mt-4">
-        <div className="card-body">
-          <h5>Continue Learning</h5>
+      <small className="text-danger">
+        Due:
+        {" "}
+        {course.next_assignment.due_date}
+      </small>
 
-          <h6>
-            {dashboard?.continue_learning?.lecture_title ||
-              "No lecture found"}
-          </h6>
+    </div>
+  ) : (
+    <div className="text-muted">
+      No Pending Assignments
+    </div>
+  )}
 
-          <ProgressBar
-            now={
-              dashboard?.continue_learning?.watched_percent || 0
-            }
-            label={`${dashboard?.continue_learning?.watched_percent || 0}%`}
-          />
-        </div>
-      </div>
+</div>
 
-      <div className="card shadow-sm mt-4">
-        <div className="card-body">
+                {/* Upcoming Lecture */}
 
-          <h5>Upcoming Live Classes</h5>
+                <div className="mb-4">
 
-          {dashboard?.upcoming_lectures?.length ? (
-            dashboard.upcoming_lectures.map((lecture) => (
-              <div
-                key={lecture.lecture_id}
-                className="border-bottom py-2"
-              >
-                <div>{lecture.title}</div>
+                  <h6>
+                    Next Live Class
+                  </h6>
 
-                <small>
-                  {lecture.date} {lecture.time}
-                </small>
+                  {course.next_lecture ? (
+                    <>
+                      <div className="fw-semibold">
+                        {
+                          course.next_lecture
+                            .lecture_title
+                        }
+                      </div>
+
+                      <small className="text-muted">
+                        {
+                          course.next_lecture
+                            .lecture_date
+                        }
+                        {" "}
+                        {
+                          course.next_lecture
+                            .lecture_time
+                        }
+                      </small>
+                    </>
+                  ) : (
+                    <div className="text-muted">
+                      No Upcoming Lectures
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Open Course */}
+
+                <button
+                  className="btn btn-primary"
+                  onClick={() =>
+                    navigate(
+                      `/dashboard/courseware/${course.enrollment_id}`
+                    )
+                  }
+                >
+                  Open Course
+                </button>
+
               </div>
-            ))
-          ) : (
-            <p>No Upcoming Lectures</p>
-          )}
 
-        </div>
+            </div>
+
+          </div>
+
+        ))}
+
       </div>
 
     </div>

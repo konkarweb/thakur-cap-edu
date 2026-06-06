@@ -7,6 +7,9 @@ import FilterCollapse from '../../components/FilterCollapse'
 import TableToolbar from '../../components/TableToolbar'
 import { useNavigate } from 'react-router-dom'
 import { getCourseTypes } from '../../api/dropdown.api'
+import ImportCsvModal  from '../../components/ImportCsvModal'
+import { exportToCsv } from '../../utils/exportToCsv'
+import { importCsv } from '../../api/students.api'
 
 // 👉 CREATE PROPER ACTION API (IMPORTANT)
 
@@ -68,7 +71,6 @@ const CoursesPage = () => {
     { key: 'CourseDate', label: 'Course Date' },
     { key: 'CourseLocation', label: 'Course Location' },
     { key: 'Fees', label: 'Fees' },
-    { key: 'NoOfRegistrations', label: 'No. of Students Enrolled' },
   ]
 
   const fetchCourses = async (appliedFilters = {}) => {
@@ -85,7 +87,11 @@ const CoursesPage = () => {
     }
   }
 
+  const [showImport, setShowImport] =
+  useState(false)
+
   return (
+    <>
     <div>
       <Breadcrumbs
         items={[
@@ -113,28 +119,24 @@ const CoursesPage = () => {
             className: 'btn btn-primary btn-sm',
             onClick: () => navigate('/dashboard/courses/new'),
           },
+          {
+            label: 'Import',
+            icon: '⬆️',
+            className: 'btn btn-warning btn-sm',
+            onClick: () =>
+              setShowImport(true),
+          },
           // 🔥 BULK ACTION
           {
             label: 'Export',
             icon: '⬇️',
             className: 'btn btn-success btn-sm',
-            disabled: selectedRows.length === 0,
-            onClick: async () => {
-              const ok = window.confirm(`Sync ${selectedRows.length} courses?`)
-              if (!ok) return
-
-              try {
-                await getCourseTypes({
-                  courseIds: selectedRows.map(r => r.CourseID),
-                })
-
-                fetchCourses(filters)
-                setSelectedRows([])
-
-              } catch (err) {
-                console.error('Bulk sync failed', err)
-              }
-            },
+            onClick: () =>
+              exportToCsv(
+                courses,
+                columns,
+                'Courses'
+              ),
           },
         ]}
       />
@@ -151,7 +153,28 @@ const CoursesPage = () => {
         setSelectedRows={setSelectedRows}
       />
     </div>
+    
+
+    <ImportCsvModal
+  show={showImport}
+  onClose={() =>
+    setShowImport(false)
+  }
+  uploadApi={(file) =>
+    importCsv(
+      'Courses',
+      'CourseID',
+      file,
+
+    )
+  }
+  onSuccess={() =>
+    fetchCourses(filters)
+  }
+/>
+</>
   )
+  
 }
 
 export default CoursesPage

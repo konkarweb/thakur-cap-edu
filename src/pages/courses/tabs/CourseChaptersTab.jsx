@@ -4,6 +4,10 @@ import TableToolbar from '../../../components/TableToolbar'
 import DataTable from '../../../components/DataTable'
 import { getChaptersByCourse } from '../../../api/students.api'
 
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
+
 const CourseChaptersTab = ({ CourseID }) => {
   const navigate = useNavigate()
   const [data, setData] = useState([])
@@ -17,7 +21,8 @@ const CourseChaptersTab = ({ CourseID }) => {
     label: 'Chapter ID',
     onClick: (row) =>
       navigate(`/dashboard/courses/${CourseID}/chapters/${row.chapter_id}`),
-  },
+    },
+    {key: 'CourseID', label: 'Course ID'},
     { key: 'chapter_title', label: 'Title' },
     { key: 'chapter_sub_title', label: 'Subtitle' },
     { key: 'chapter_order', label: 'Order' },
@@ -53,6 +58,9 @@ const CourseChaptersTab = ({ CourseID }) => {
     }
   }, [CourseID])
 
+ const [showImport, setShowImport] =
+    useState(false)
+
   return (
     <>
      <TableToolbar
@@ -66,6 +74,25 @@ const CourseChaptersTab = ({ CourseID }) => {
             className: 'btn btn-primary btn-sm',
             onClick: () => navigate(`/dashboard/courses/${CourseID}/chapters/new`),
           },
+          {
+                      label: 'Import',
+                      icon: '⬆️',
+                      className: 'btn btn-warning btn-sm',
+                      onClick: () =>
+                      setShowImport(true),
+                    },
+                  // 🔥 BULK ACTION
+                    {
+                      label: 'Export',
+                      icon: '⬇️',
+                      className: 'btn btn-success btn-sm',
+                      onClick: () =>
+                      exportToCsv(
+                      data,
+                      columns,
+                      'Chapters'
+                       ),
+                    },
         ]}
       />
 
@@ -77,7 +104,27 @@ const CourseChaptersTab = ({ CourseID }) => {
          selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
         />
+
+        <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'chapters',
+            'chapter_id',
+            file,
+      
+          )
+        }
+        onSuccess={() =>
+          fetchCourses(filters)
+        }
+      />
     </>
+
+    
   )
 }
 

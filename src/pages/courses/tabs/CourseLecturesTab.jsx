@@ -5,6 +5,9 @@ import TableToolbar from '../../../components/TableToolbar'
 import DataTable from '../../../components/DataTable'
 
 import { getLecturesByCourse } from '../../../api/students.api'
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
 
 const CourseLecturesTab = ({ CourseID }) => {
 
@@ -21,6 +24,7 @@ const CourseLecturesTab = ({ CourseID }) => {
       onClick: (row) =>
         navigate(`/dashboard/courses/${CourseID}/lectures/${row.lecture_id}`),
     },
+    {key: 'CourseID', label: 'Course ID'},
 
     {
       key: 'lecture_title',
@@ -84,6 +88,9 @@ const CourseLecturesTab = ({ CourseID }) => {
 
   }, [CourseID])
 
+   const [showImport, setShowImport] =
+      useState(false)
+
   return (
     <>
       <TableToolbar
@@ -98,6 +105,25 @@ const CourseLecturesTab = ({ CourseID }) => {
             onClick: () =>
               navigate(`/dashboard/courses/${CourseID}/lectures/new`),
           },
+         {
+            label: 'Import',
+            icon: '⬆️',
+            className: 'btn btn-warning btn-sm',
+            onClick: () =>
+            setShowImport(true),
+          },
+        // 🔥 BULK ACTION
+          {
+            label: 'Export',
+            icon: '⬇️',
+            className: 'btn btn-success btn-sm',
+            onClick: () =>
+            exportToCsv(
+            data,
+            columns,
+            'Lectures'
+             ),
+          },
         ]}
       />
 
@@ -108,6 +134,24 @@ const CourseLecturesTab = ({ CourseID }) => {
         selectable={true}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
+      />
+
+      <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'lectures',
+            'lecture_id',
+            file,
+      
+          )
+        }
+        onSuccess={() =>
+          fetchCourses(filters)
+        }
       />
     </>
   )

@@ -296,48 +296,8 @@ export const getLecturesByCourse = (CourseID) =>
     params: { CourseID },
   })
 
-  export const getStudentDashboard = (courseId) => 
-  {
-    return {
-  "course_id": 51,
-  "course_title": "Stock Market Made Easy",
-
-  "progress": {
-    "chapters_total": 10,
-    "chapters_completed": 5,
-
-    "lectures_total": 20,
-    "lectures_completed": 12,
-
-    "ebooks_total": 5,
-    "ebooks_completed": 3,
-
-    "overall_percent": 65
-  },
-
-  "attendance": {
-    "present": 15,
-    "absent": 2,
-    "not_marked": 3,
-    "attendance_percent": 88
-  },
-
-  "continue_learning": {
-    "lecture_id": 5,
-    "lecture_title": "Basics & History of Stock Market",
-    "watched_percent": 45
-  },
-
-  "upcoming_lectures": [
-    {
-      "lecture_id": 10,
-      "title": "Technical Analysis",
-      "date": "2026-06-01",
-      "time": "22:00:00"
-    }
-  ]
-}
-  }
+  export const getStudentDashboard = () =>
+  api.get('/data/dashboard_student');
  
 
 export const getLectureById = (lecture_id) =>
@@ -346,6 +306,29 @@ export const getLectureById = (lecture_id) =>
   })
 
 
+export const importCsv = (
+  entityName,
+  entityIdKey,
+  file
+) => {
+
+  const formData = new FormData()
+
+  formData.append('file', file)
+  formData.append('entity', entityName)
+  formData.append('keyField', entityIdKey)
+
+  return api.post(
+    '/admin/import_csv',
+    formData,
+    {
+      headers: {
+        'Content-Type':
+          'multipart/form-data',
+      },
+    }
+  )
+}
 
 export const createLecture = (payload) =>
   api.post('/admin/create_lecture', payload)

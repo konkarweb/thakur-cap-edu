@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import TableToolbar from '../../../components/TableToolbar'
 import DataTable from '../../../components/DataTable'
 import { getAssignmentsByChapter } from '../../../api/students.api'
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
 
 const CourseAssignmentsTab = ({ chapter_id, CourseID }) => {
   const navigate = useNavigate()
@@ -20,6 +23,7 @@ const CourseAssignmentsTab = ({ chapter_id, CourseID }) => {
           `/dashboard/courses/${CourseID}/chapters/${chapter_id}/assignments/${row.assignment_id}`
         ),
     },
+    {key: 'chapter_id', label: 'Chapter ID'},
     { key: 'title', label: 'Title' },
     { key: 'due_date', label: 'Due Date' },
     {
@@ -47,6 +51,9 @@ const CourseAssignmentsTab = ({ chapter_id, CourseID }) => {
     if (chapter_id) fetchAssignments()
   }, [chapter_id])
 
+   const [showImport, setShowImport] =
+      useState(false)
+
   return (
     <>
       <TableToolbar
@@ -63,6 +70,25 @@ const CourseAssignmentsTab = ({ chapter_id, CourseID }) => {
                 `/dashboard/courses/${CourseID}/chapters/${chapter_id}/assignments/new`
               ),
           },
+          {
+                      label: 'Import',
+                      icon: '⬆️',
+                      className: 'btn btn-warning btn-sm',
+                      onClick: () =>
+                      setShowImport(true),
+                    },
+                  // 🔥 BULK ACTION
+                    {
+                      label: 'Export',
+                      icon: '⬇️',
+                      className: 'btn btn-success btn-sm',
+                      onClick: () =>
+                      exportToCsv(
+                      data,
+                      columns,
+                      'Assignments'
+                       ),
+                    },
         ]}
       />
 
@@ -73,6 +99,23 @@ const CourseAssignmentsTab = ({ chapter_id, CourseID }) => {
         selectable={true}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
+      />
+      <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'assignments',
+            'assignment_id',
+            file,
+      
+          )
+        }
+        onSuccess={() =>
+          fetchCourses(filters)
+        }
       />
     </>
   )

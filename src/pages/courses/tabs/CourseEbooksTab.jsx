@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import TableToolbar from '../../../components/TableToolbar'
 import DataTable from '../../../components/DataTable'
 import { getEbooksByCourse } from '../../../api/students.api'
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
 
 const CourseEbooksTab = ({ CourseID }) => {
   const navigate = useNavigate()
@@ -17,6 +20,7 @@ const CourseEbooksTab = ({ CourseID }) => {
       onClick: (row) =>
         navigate(`/dashboard/courses/${CourseID}/ebooks/${row.ebook_id}`),
     },
+    {key: 'CourseID', label: 'Course ID'},
     { key: 'book_name', label: 'Book Name' },
     { key: 'video_platform', label: 'Platform' },
     { key: 'duration_seconds', label: 'Duration (sec)' },
@@ -51,6 +55,9 @@ const CourseEbooksTab = ({ CourseID }) => {
     if (CourseID) fetchEbooks()
   }, [CourseID])
 
+   const [showImport, setShowImport] =
+      useState(false)
+
   return (
     <>
       <TableToolbar
@@ -65,6 +72,25 @@ const CourseEbooksTab = ({ CourseID }) => {
             onClick: () =>
               navigate(`/dashboard/courses/${CourseID}/ebooks/new`),
           },
+          {
+                                label: 'Import',
+                                icon: '⬆️',
+                                className: 'btn btn-warning btn-sm',
+                                onClick: () =>
+                                setShowImport(true),
+                              },
+                            // 🔥 BULK ACTION
+                              {
+                                label: 'Export',
+                                icon: '⬇️',
+                                className: 'btn btn-success btn-sm',
+                                onClick: () =>
+                                exportToCsv(
+                                data,
+                                columns,
+                                'Ebooks'
+                                 ),
+                              },
         ]}
       />
 
@@ -75,6 +101,24 @@ const CourseEbooksTab = ({ CourseID }) => {
         selectable={true}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
+      />
+
+      <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'course_ebooks',
+            'ebook_id',
+            file,
+      
+          )
+        }
+        onSuccess={() =>
+          fetchCourses(filters)
+        }
       />
     </>
   )

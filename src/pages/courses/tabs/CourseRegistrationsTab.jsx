@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import TableToolbar from '../../../components/TableToolbar'
 import { getRegistrationsByCourse } from '../../../api/students.api'
 import DataTable from '../../../components/DataTable'
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
 
 const CourseRegistrationsTab = ({ CourseID }) => {
   const navigate = useNavigate()
@@ -33,6 +36,7 @@ const CourseRegistrationsTab = ({ CourseID }) => {
       clickable: true,
       onClick: (row) => navigate(`/dashboard/courses/${CourseID}/registrations/${row.RegID}`),
     },
+     { key: 'CourceID', label: 'Course ID' },
     { key: 'Fname', label: 'First Name' },
     { key: 'Lname', label: 'Last Name' },
     { key: 'ContactNo', label: 'Contact Number' },
@@ -47,6 +51,7 @@ const CourseRegistrationsTab = ({ CourseID }) => {
     { key: 'PaymentStatus', label: 'Payment Status' },
     { key: 'Fees', label: 'Fees' },
     { key: 'RegisteredOn', label: 'Registered On' },
+   
   ]
 
   useEffect(() => {
@@ -71,6 +76,9 @@ const CourseRegistrationsTab = ({ CourseID }) => {
     }
   }, [CourseID])
 
+  const [showImport, setShowImport] =
+    useState(false)
+
   return (
     <>
      <TableToolbar
@@ -84,6 +92,25 @@ const CourseRegistrationsTab = ({ CourseID }) => {
             className: 'btn btn-primary btn-sm',
             onClick: () => navigate(`/dashboard/courses/${CourseID}/registrations/new`),
           },
+          {
+                      label: 'Import',
+                      icon: '⬆️',
+                      className: 'btn btn-warning btn-sm',
+                      onClick: () =>
+                        setShowImport(true),
+                    },
+                    // 🔥 BULK ACTION
+                    {
+                      label: 'Export',
+                      icon: '⬇️',
+                      className: 'btn btn-success btn-sm',
+                      onClick: () =>
+                        exportToCsv(
+                          data,
+                          columns,
+                          'Registrations'
+                        ),
+                    },
         ]}
       />
     <DataTable 
@@ -94,6 +121,22 @@ const CourseRegistrationsTab = ({ CourseID }) => {
         setSelectedRows={setSelectedRows}
         selectable={true} // 🔥 ENABLE
       loading={loading} />
+
+      <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'Registrations',
+            'RegID',
+            file,
+      
+          )
+        }
+       
+      />
     </>
   )
 }

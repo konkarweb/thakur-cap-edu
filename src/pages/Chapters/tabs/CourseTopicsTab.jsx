@@ -4,6 +4,9 @@ import TableToolbar from '../../../components/TableToolbar'
 import DataTable from '../../../components/DataTable'
 
 import { getTopicsByChapter } from '../../../api/students.api'
+import ImportCsvModal  from '../../../components/ImportCsvModal'
+import { exportToCsv } from '../../../utils/exportToCsv'
+import { importCsv } from '../../../api/students.api'
 
 const CourseTopicsTab = ({ chapter_id,  CourseID  }) => {
   const navigate = useNavigate()
@@ -17,6 +20,7 @@ const CourseTopicsTab = ({ chapter_id,  CourseID  }) => {
        onClick: (row) =>
       navigate(`/dashboard/courses/${CourseID}/chapters/${chapter_id}/topics/${row.topic_id}`)
      },
+     {key: 'chapter_id', label: 'Chapter ID'},
     { key: 'topic_title', label: 'Title' },
     { key: 'topic_order', label: 'Order' },
     {
@@ -43,6 +47,10 @@ const CourseTopicsTab = ({ chapter_id,  CourseID  }) => {
     if (chapter_id) fetchTopics()
   }, [chapter_id])
 
+
+   const [showImport, setShowImport] =
+      useState(false)
+
   return (
     <>
     <TableToolbar
@@ -56,6 +64,25 @@ const CourseTopicsTab = ({ chapter_id,  CourseID  }) => {
             className: 'btn btn-primary btn-sm',
             onClick: () => navigate(`/dashboard/courses/${CourseID}/chapters/${chapter_id}/topics/new`),
           },
+          {
+                      label: 'Import',
+                      icon: '⬆️',
+                      className: 'btn btn-warning btn-sm',
+                      onClick: () =>
+                      setShowImport(true),
+                    },
+                  // 🔥 BULK ACTION
+                    {
+                      label: 'Export',
+                      icon: '⬇️',
+                      className: 'btn btn-success btn-sm',
+                      onClick: () =>
+                      exportToCsv(
+                      data,
+                      columns,
+                      'Topics'
+                       ),
+                    },
         ]}
       />
   <DataTable 
@@ -66,6 +93,23 @@ const CourseTopicsTab = ({ chapter_id,  CourseID  }) => {
     selectedRows={selectedRows}
     setSelectedRows={setSelectedRows}/>
   
+  <ImportCsvModal
+        show={showImport}
+        onClose={() =>
+          setShowImport(false)
+        }
+        uploadApi={(file) =>
+          importCsv(
+            'topics',
+            'topic_id',
+            file,
+      
+          )
+        }
+        onSuccess={() =>
+          fetchCourses(filters)
+        }
+      />
   </>
   )
 }
