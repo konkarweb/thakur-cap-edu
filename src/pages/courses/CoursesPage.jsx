@@ -10,6 +10,7 @@ import { getCourseTypes } from '../../api/dropdown.api'
 import ImportCsvModal  from '../../components/ImportCsvModal'
 import { exportToCsv } from '../../utils/exportToCsv'
 import { importCsv } from '../../api/students.api'
+import TableSettingsModal from '../../components/TableSettingsModal'
 
 // 👉 CREATE PROPER ACTION API (IMPORTANT)
 
@@ -17,7 +18,18 @@ import { importCsv } from '../../api/students.api'
 const CoursesPage = () => {
   const navigate = useNavigate()
 
-  const [filters, setFilters] = useState({})
+  // API Search Filters (DynamicFilter)
+const [searchFilters, setSearchFilters] = useState({})
+
+// UI Table Filters (Settings Popup)
+const [tableFilters, setTableFilters] = useState({})
+
+const [sortConfig, setSortConfig] =
+  useState({
+    key: '',
+    direction: 'asc'
+  })
+
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -55,7 +67,7 @@ const CoursesPage = () => {
       getParams: (row) => ({
         courseId: row.CourseID,
       }),
-      onSuccess: () => fetchCourses(filters),
+      onSuccess: () => fetchCourses(searchFilters),
     },
   ]
 
@@ -74,21 +86,87 @@ const CoursesPage = () => {
   ]
 
   const fetchCourses = async (appliedFilters = {}) => {
-    setLoading(true)
-    try {
-      setFilters(appliedFilters)
-      const res = await getCoursesWithNoOfRegistration(appliedFilters)
-      setCourses(res.data.data || [])
-      setSelectedRows([]) // reset selection
-    } catch (err) {
-      console.error('Failed to fetch courses', err)
-    } finally {
-      setLoading(false)
-    }
+  setLoading(true)
+
+  try {
+    // Save API search filters
+    setSearchFilters(appliedFilters)
+
+    const res =
+      await getCoursesWithNoOfRegistration(
+        appliedFilters
+      )
+
+    setCourses(res.data.data || [])
+    setSelectedRows([])
+  } catch (err) {
+    console.error(
+      'Failed to fetch courses',
+      err
+    )
+  } finally {
+    setLoading(false)
   }
+}
 
   const [showImport, setShowImport] =
   useState(false)
+
+ const [showSettings, setShowSettings] =
+  useState(false)
+
+
+
+  const processedData = [...courses]
+
+  .filter((row) => {
+
+    return Object.entries(
+      tableFilters
+    ).every(([key, value]) => {
+
+      if (!value) return true
+
+      return String(
+        row[key] ?? ''
+      )
+        .toLowerCase()
+        .includes(
+          String(value)
+            .toLowerCase()
+        )
+    })
+  })
+
+  .sort((a, b) => {
+
+    if (!sortConfig.key)
+      return 0
+
+    const valA =
+      a[sortConfig.key]
+
+    const valB =
+      b[sortConfig.key]
+
+    if (valA == null) return -1
+    if (valB == null) return 1
+
+    if (valA < valB)
+      return sortConfig.direction ===
+        'asc'
+        ? -1
+        : 1
+
+    if (valA > valB)
+      return sortConfig.direction ===
+        'asc'
+        ? 1
+        : -1
+
+    return 0
+  })
+
 
   return (
     <>
@@ -114,30 +192,37 @@ const CoursesPage = () => {
         selectedCount={selectedRows.length} // 🔥 NEW
         actions={[
           {
-            label: 'Add Course',
+            label: '',
             icon: '➕',
-            className: 'btn btn-primary btn-sm',
+            className: 'btn btn-light border-0',
             onClick: () => navigate('/dashboard/courses/new'),
           },
           {
-            label: 'Import',
-            icon: '⬆️',
-            className: 'btn btn-warning btn-sm',
+            label: 'Upload',
+            icon: '📤',
+            className: 'btn btn-light border-0',
             onClick: () =>
               setShowImport(true),
           },
           // 🔥 BULK ACTION
           {
-            label: 'Export',
-            icon: '⬇️',
-            className: 'btn btn-success btn-sm',
+            label: 'Download',
+            icon: '📥',
+            className: 'btn btn-light border-0',
             onClick: () =>
               exportToCsv(
-                courses,
+                processedData,
                 columns,
                 'Courses'
               ),
           },
+          {
+  label: '',
+  icon: '⚙️',
+  className: 'btn btn-light border-0',
+  onClick: () =>
+    setShowSettings(true),
+}
         ]}
       />
 
@@ -145,7 +230,7 @@ const CoursesPage = () => {
 
       <DataTable
         columns={columns}
-        data={courses}
+        data={processedData}
         loading={loading}
         actions={actions}
         selectable={true} // 🔥 ENABLE
@@ -171,6 +256,18 @@ const CoursesPage = () => {
   onSuccess={() =>
     fetchCourses(filters)
   }
+/>
+
+<TableSettingsModal
+  show={showSettings}
+  onClose={() =>
+    setShowSettings(false)
+  }
+  columns={columns}
+  filters={tableFilters}
+  setFilters={setTableFilters}
+  sortConfig={sortConfig}
+  setSortConfig={setSortConfig}
 />
 </>
   )

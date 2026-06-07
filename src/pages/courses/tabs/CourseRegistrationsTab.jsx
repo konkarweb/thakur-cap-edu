@@ -7,6 +7,7 @@ import DataTable from '../../../components/DataTable'
 import ImportCsvModal  from '../../../components/ImportCsvModal'
 import { exportToCsv } from '../../../utils/exportToCsv'
 import { importCsv } from '../../../api/students.api'
+import TableSettingsModal from '../../../components/TableSettingsModal'
 
 const CourseRegistrationsTab = ({ CourseID }) => {
   const navigate = useNavigate()
@@ -79,6 +80,61 @@ const CourseRegistrationsTab = ({ CourseID }) => {
   const [showImport, setShowImport] =
     useState(false)
 
+    const [showSettings, setShowSettings] =
+  useState(false)
+
+const [filters, setFilters] =
+  useState({})
+
+const [sortConfig, setSortConfig] =
+  useState({
+    key: '',
+    direction: 'asc'
+  })
+
+  const processedData = [...data]
+
+  .filter(row => {
+
+    return Object.entries(filters)
+      .every(([key, value]) => {
+
+        if (!value) return true
+
+        return String(
+          row[key] ?? ''
+        )
+          .toLowerCase()
+          .includes(
+            value.toLowerCase()
+          )
+      })
+  })
+
+  .sort((a, b) => {
+
+    if (!sortConfig.key)
+      return 0
+
+    const valA =
+      a[sortConfig.key]
+
+    const valB =
+      b[sortConfig.key]
+
+    if (valA < valB)
+      return sortConfig.direction === 'asc'
+        ? -1
+        : 1
+
+    if (valA > valB)
+      return sortConfig.direction === 'asc'
+        ? 1
+        : -1
+
+    return 0
+  })
+
   return (
     <>
      <TableToolbar
@@ -87,15 +143,15 @@ const CourseRegistrationsTab = ({ CourseID }) => {
         selectedCount={selectedRows.length} // 🔥 NEW
         actions={[
           {
-            label: 'Add Registration',
+            label: '',
             icon: '➕',
-            className: 'btn btn-primary btn-sm',
+            className: '',
             onClick: () => navigate(`/dashboard/courses/${CourseID}/registrations/new`),
           },
           {
                       label: 'Import',
                       icon: '⬆️',
-                      className: 'btn btn-warning btn-sm',
+                      className: '',
                       onClick: () =>
                         setShowImport(true),
                     },
@@ -103,19 +159,26 @@ const CourseRegistrationsTab = ({ CourseID }) => {
                     {
                       label: 'Export',
                       icon: '⬇️',
-                      className: 'btn btn-success btn-sm',
+                      className: '',
                       onClick: () =>
                         exportToCsv(
-                          data,
+                          processedData,
                           columns,
                           'Registrations'
                         ),
                     },
+                    {
+  label: '',
+  icon: '⚙️',
+  className: '',
+  onClick: () =>
+    setShowSettings(true),
+}
         ]}
       />
     <DataTable 
       columns={columns} 
-      data={data} 
+      data={processedData}
       actions={actions}
       selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
@@ -137,6 +200,19 @@ const CourseRegistrationsTab = ({ CourseID }) => {
         }
        
       />
+
+      <TableSettingsModal
+  show={showSettings}
+  onClose={() =>
+    setShowSettings(false)
+  }
+  columns={columns}
+  filters={filters}
+  setFilters={setFilters}
+  sortConfig={sortConfig}
+  setSortConfig={setSortConfig}
+/>
+
     </>
   )
 }

@@ -25,7 +25,7 @@ borderRadius: '6px 6px 0 0',
 {actions.map((action, index) => (
 <button
 key={index}
-className={action.className || 'btn btn-outline-secondary btn-sm'}
+className={action.className}
 onClick={action.onClick}
 disabled={action.disabled}
 title={action.tooltip}
