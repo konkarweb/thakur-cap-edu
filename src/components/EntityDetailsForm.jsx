@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 const EntityDetailsForm = ({
   fields = [],
@@ -161,6 +163,23 @@ const EntityDetailsForm = ({
                   onChange={e => handleChange(f.key, e.target.value)}
                 />
               )
+               // DATE
+              : f.type === 'date' ? (
+                <><br></br>
+                <DatePicker
+                  selected={form[f.key] ? new Date(form[f.key]) : null}
+                  onChange={date =>
+                    handleChange(
+                      f.key,
+                      date.toISOString().split('T')[0]
+                    )
+                  }
+                  dateFormat="yyyy-MM-dd"
+                   className="form-control"
+                />
+                </>
+              )
+
 
               // INPUT
               : (

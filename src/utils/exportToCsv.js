@@ -10,6 +10,7 @@ export const exportToCsv = (
   }
 
   const headers = columns.map(col => col.key)
+console.log('Exporting to CSV:', { headers, data, fileName })
 
   const rows = data.map(row =>
     columns.map(col => {
@@ -24,6 +25,7 @@ export const exportToCsv = (
     })
   )
 
+  console.log('Exporting to CSV:', { headers, rows, fileName })
   const csvContent = [
     headers.join(','),
     ...rows.map(r => r.join(','))

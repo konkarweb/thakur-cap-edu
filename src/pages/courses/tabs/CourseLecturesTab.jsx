@@ -150,8 +150,16 @@ const CourseLecturesTab = ({ CourseID }) => {
           )
         }
         onSuccess={() =>
-          fetchCourses(filters)
-        }
+          getLecturesByCourse(CourseID)
+          .then(res => {
+          const rows = res.data?.data
+          ? Array.isArray(res.data.data)
+            ? res.data.data
+            : [res.data.data]
+          : []
+
+        setData(rows)
+        } ) }
       />
     </>
   )

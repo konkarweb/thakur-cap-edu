@@ -300,6 +300,11 @@ export const getLecturesByCourse = (CourseID) =>
   api.get('/data/dashboard_student');
  
 
+  export const getAdminDashboard = (params) =>
+  api.get("/data/dashboard_admin", {
+    params
+  });
+
 export const getLectureById = (lecture_id) =>
   api.get('/data/get_lecture', {
     params: { lecture_id },
