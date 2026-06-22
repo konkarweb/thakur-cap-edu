@@ -43,7 +43,7 @@ console.log('DATA →', error.response?.data)
   return (
     <div className="container vh-100 d-flex align-items-center justify-content-center">
       <div className="card p-4 shadow" style={{ width: 400 }}>
-        <h4 className="text-center mb-3">Edu LMS Login</h4>
+        <h4 className="text-center mb-3">Thakur Capital Login</h4>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -65,6 +65,12 @@ console.log('DATA →', error.response?.data)
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
+          <div className="text-end mb-3">
+  <a href="/forgot-password">
+    Forgot Password?
+  </a>
+</div>
 
           <button className="btn btn-primary w-100" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}

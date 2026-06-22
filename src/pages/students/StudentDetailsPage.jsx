@@ -6,6 +6,7 @@ import EntityDetailsForm from '../../components/EntityDetailsForm'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import SnapHeaderCollapse from '../../components/SnapHeaderCollapse'
 import StudentCoursesTab from '../../pages/students/tabs/StudentCoursesTab'
+import StudentSummary from '../../pages/students/tabs/StudentSummary'
 import { getStudentById, updateStudent } from '../../api/students.api'
 
 const StudentDetailsPage = () => {
@@ -59,7 +60,11 @@ const StudentDetailsPage = () => {
             label: 'Courses',
             render: () => <StudentCoursesTab studentId={student.user_id} />,
           },
-         
+          {
+            key: 'summary',
+            label: 'Summary',
+            render: () => <StudentSummary studentId={student.user_id} />,
+          }
         ]}
       />
     </>

@@ -28,6 +28,11 @@ export const getStudents = (filters = {}) => {
   })
 }
 
+export const getStudentsByCourse = (course_id) => {
+  return api.get('/data/get_students', {
+    params: { course_id }, // future ready
+  })
+}
 export const getMonitors = async (filters = {}) => {
   const res = await api.get('/data/get_monitors', {
     params: filters,
@@ -298,6 +303,11 @@ export const getLecturesByCourse = (CourseID) =>
 
   export const getStudentDashboard = () =>
   api.get('/data/dashboard_student');
+ 
+  export const getStudentSummary = (student_id) =>
+  api.get('/data/StudentSummary', {
+    params: { student_id }
+  });
  
 
   export const getAdminDashboard = (params) =>

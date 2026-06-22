@@ -9,6 +9,8 @@ import CourseRegistrationsTab from './tabs/CourseRegistrationsTab'
 import CourseChaptersTab from './tabs/CourseChaptersTab'
 import CourseEbooksTab from './tabs/CourseEbooksTab'
 import CourseLecturesTab from './tabs/CourseLecturesTab'
+import CourseSummary from './tabs/CourseSummary'
+import CourseStudentsTab from './tabs/CourseStudentsTab'
 
 import { getCourseById, updateCourse, createCourse} from '../../api/students.api'
 import { getCourseTypes } from '../../api/dropdown.api'
@@ -207,7 +209,18 @@ const isCourseTemplate =
             key: 'lectures',
             label: 'Lectures',
             render: () => <CourseLecturesTab CourseID={id} />,
-          }
+          },
+          {
+            key: 'summary',
+            label: 'Summary',
+            render: () => <CourseSummary CourseID={id} />,
+          },
+          {
+            key: 'students',
+            label: 'Students',
+            render: () => <CourseStudentsTab CourseID={id} />,
+          },
+
         ]}
       />
     </>

@@ -31,6 +31,8 @@ import TopicDetailsPage from './pages/topics/TopicDetailsPage'
 import TopicViewPage from './pages/topicContent/TopicViewPage'
 import LectureDetailsPage from './pages/Lectures/LectureDetailsPage'
 import CourseTemplatesPage from './pages/CourseTemplate/CourseTemplatesPage'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 function App() {
   return (
@@ -42,9 +44,12 @@ function App() {
   <Route
      path="/login" element={
     <PublicRoute><Login /></PublicRoute>
+    
     } 
     />
   <Route path="/unauthorized" element={<Unauthorized />} />
+  <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+  <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
   {/* Protected Dashboard routes */}
   <Route path="/dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>

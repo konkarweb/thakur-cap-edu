@@ -34,12 +34,6 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobile }) => {
       roles: ['ADMIN'],
     },
     {
-      label: 'Users',
-      icon: '👥',
-      path: '/dashboard/users',
-      roles: ['ADMIN', 'MONITOR'],
-    },
-    {
       label: 'Students',
       icon: '👥',
       path: '/dashboard/students',
@@ -66,7 +60,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobile }) => {
       }}
     >
       <div className="py-3 text-center fw-bold border-bottom">
-        {collapsed ? 'TC' : 'Thakur Edu'}
+        {collapsed ? 'TC' : 'Thakur Capital'}
       </div>
 
       <ul className="nav flex-column mt-3">
